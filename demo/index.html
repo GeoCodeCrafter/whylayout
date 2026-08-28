@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>whylayout - three layouts that are lying to you</title>
+    <link rel="stylesheet" href="./broken.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Three layouts that are lying to you</h1>
+      <p>
+        Each section below is broken in a way that looks like a mystery and is not.
+        Press <kbd>I</kbd> or click the button, then click the offending element.
+      </p>
+      <button type="button" id="inspect">Inspect</button>
+    </header>
+
+    <section>
+      <h2>1. The card that will not shrink</h2>
+      <p>
+        All three cards are <code>flex: 1 1 0</code>, so they should be exactly the
+        same width. One of them is nearly three times the others, and the row
+        overflows.
+      </p>
+      <div class="row">
+        <div class="card"><p>Short content.</p></div>
+        <div class="card">
+          <p class="card__meta">https://example.com/averylongunbreakableurlwithnohyphens</p>
+        </div>
+        <div class="card"><p>Also short.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. The gap that is not where you think</h2>
+      <p>
+        The panel has no top padding and no top margin, and yet there is 48px of air
+        above it.
+      </p>
+      <div class="panel">
+        <h3 class="panel__title">Panel heading</h3>
+        <p>The heading's top margin is outside the panel, pushing the panel down.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. The sideways scroll</h2>
+      <p>Something on this page is wider than the viewport. Exactly one thing.</p>
+      <div class="grid">
+        <div class="tile">Fine</div>
+        <div class="tile tile--wide">Not fine</div>
+        <div class="tile">Fine</div>
+      </div>
+    </section>
+
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

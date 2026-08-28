@@ -6,15 +6,21 @@
 Click an element. Get a sentence explaining why it looks like that.
 
 ```
-.card is 340px wide, not the 240px you asked for.
+div.card will not shrink below 426.3px. Flex items start at min-width: auto,
+which refuses to go narrower than their widest unbreakable content.
 
-  width: 240px          main.css:47      applied
-  min-width: auto       (initial)        <- this is why
+  - div.row is display: flex, so div.card is a flex item
+  - min-width resolves to auto, the initial value for a flex item
+  - width is 426.3px, and the widest unbreakable content inside is 426.3px
+    - the content is the floor
+  - the flex line overflows div.row by 126.5px
 
-  .card is a flex item. Flex items default to min-width: auto, which
-  refuses to shrink below the widest unbreakable content - the 340px
-  URL in .card__meta. Set min-width: 0 on .card to allow shrinking.
+  Fix: min-width: 0  on  div.card
+       Or overflow-wrap: anywhere on the content, if the long word should
+       break instead.
 ```
+
+That is real output, copied from the demo page, not an illustration.
 
 ---
 
@@ -66,6 +72,10 @@ expect(report.findings.map((f) => f.rule)).not.toContain('flex-min-width-auto');
 | Which rule won? | Winner and runners-up with computed specificity, layer, and `!important` |
 
 Every finding carries a `fix` - the declaration to add and where to add it.
+
+**Shipping today:** the flex, margin-collapse and sideways-scroll findings. The
+rest are the v0.2 milestone in [PLAN.md](PLAN.md), and this table will not claim
+them until they work.
 
 ## The rules that are not negotiable
 

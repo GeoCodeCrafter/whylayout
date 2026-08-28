@@ -1,0 +1,106 @@
+/* Deliberately broken. Each fault is one of the v0.1 findings, and the fix is
+   commented next to it so the demo doubles as documentation. */
+
+:root {
+  color-scheme: light dark;
+  --ink: #14161a;
+  --paper: #fbfbfd;
+  --line: #d8dbe2;
+}
+
+body {
+  margin: 0;
+  padding: 0 24px 96px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+.page-header {
+  max-width: 62ch;
+  padding: 48px 0 24px;
+}
+
+h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin: 0 0 0.4em;
+}
+
+section {
+  max-width: 1100px;
+  margin: 0 auto 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+button {
+  font: inherit;
+  padding: 8px 16px;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+
+/* 1. Flex items default to min-width: auto, so the middle card refuses to go
+      narrower than that unbreakable URL. Fix: min-width: 0 on .card.
+
+      Note there is deliberately no `width` on .card: with a width specified, the
+      automatic minimum size is the smaller of the specified and content
+      suggestions, so the specified width would become the floor instead and
+      there would be nothing to explain. */
+.row {
+  display: flex;
+  gap: 16px;
+  width: 480px;
+  max-width: 100%;
+  border: 1px dashed var(--line);
+}
+
+.card {
+  flex: 1 1 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: white;
+}
+
+.card__meta {
+  margin: 0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+/* 2. Nothing separates .panel from its first child, so .panel__title's top
+      margin collapses through and moves the panel. Fix: display: flow-root. */
+.panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-top-width: 0;
+  border-radius: 8px;
+  padding: 0 16px 16px;
+}
+
+.panel__title {
+  margin-top: 48px;
+}
+
+/* 3. One tile is wider than the page and drags every ancestor with it.
+      Fix: max-width: 100%, or min-width: 0 since it is a grid item. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 16px;
+}
+
+.tile {
+  padding: 24px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.tile--wide {
+  width: 1600px;
+}
