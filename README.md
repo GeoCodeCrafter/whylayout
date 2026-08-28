@@ -62,20 +62,47 @@ expect(report.findings.map((f) => f.rule)).not.toContain('flex-min-width-auto');
 
 | Question | Answer it gives |
 | --- | --- |
-| Why is this element this width? | The sizing chain: specified, constrained, available - and which link bound it |
-| Why did my `width` do nothing? | The property that overrode it, or the layout mode that ignores it |
-| Why is there a gap here? | Which margin collapsed into which, and the ancestor that would stop it |
-| Why won't this flex item shrink? | `min-width: auto` and the unbreakable content setting the floor |
-| Why is my `z-index` ignored? | The ancestor that created the stacking context, and what created it |
-| Why does the page scroll sideways? | The single widest offending node, not a list of suspects |
+| Why is this element this width? | The constraint that bound it - `max-width` capping or `min-width` raising the width you declared |
+| Why did my `width` do nothing? | That it is inert on a non-replaced inline element, or which rule beat it |
+| Why is there a gap here? | Which margin collapsed through which ancestor, and what would stop it |
+| Why won't this flex item shrink? | `min-width: auto` and the measured unbreakable content setting the floor |
+| Why is my `z-index` ignored? | Whether it is inert on a static element, or trapped in an ancestor's stacking context |
+| Why does the page scroll sideways? | The one element that does not fit its parent, not a list of suspects |
 | Why is this `position: fixed` element not fixed? | The ancestor `transform`/`filter`/`contain` that made it a containing block |
 | Which rule won? | Winner and runners-up with computed specificity, layer, and `!important` |
 
 Every finding carries a `fix` - the declaration to add and where to add it.
 
-**Shipping today:** the flex, margin-collapse and sideways-scroll findings. The
-rest are the v0.2 milestone in [PLAN.md](PLAN.md), and this table will not claim
-them until they work.
+All eight work today, and each has a section on the demo page that provokes it.
+Still to come, in [PLAN.md](PLAN.md): the devtools panel, a grid engine, and a
+docs site.
+
+## The cascade, including the part that runs backwards
+
+`explainCascade` resolves one property and shows what lost:
+
+```js
+whylayout.explainCascade(document.querySelector('.contested'), 'color');
+```
+
+```
+color on h3#contested.contested is rebeccapurple, from .contested. 3 other declarations lost.
+
+  - color: rebeccapurple !important from .contested (specificity 0-1-0, @layer base)   [broken.css]
+  - beaten: color: seagreen !important from h3.contested - it is in @layer theme and the
+    winner is in @layer base - for !important declarations, earlier layers win and layered
+    beats unlayered
+  - beaten: color: darkorange from #contested - the winner is !important
+  - beaten: color: crimson from .contested - the winner is !important
+```
+
+That third line is the reason this engine exists rather than a specificity
+calculator. For a normal declaration, unlayered author styles beat layered ones
+and a later `@layer` beats an earlier one. For `!important`, **both of those
+reverse**: layered beats unlayered, and the *earlier* layer wins. It is
+deliberate - it lets a design system publish overridable defaults in a layer and
+still enforce the few rules it must - and it is the single most surprising rule
+in the modern cascade.
 
 ## The rules that are not negotiable
 
@@ -90,9 +117,27 @@ them until they work.
 4. **Plain English, jargon second.** "Flex items refuse to shrink below their
    content" before "`min-width: auto`", never the other way round.
 
+## Running the demo
+
+```bash
+npm install
+npm run demo
+```
+
+Seven deliberately broken sections, one per finding, at
+<http://localhost:5173>. Press <kbd>I</kbd> and click the offending element.
+
 ## Status
 
-Pre-alpha. See [PLAN.md](PLAN.md) for the build order.
+v0.1. All eight findings work and are verified against a real browser, not only
+against unit tests - which mattered, because running it for real is what caught
+the overflow rule naming a victim instead of a culprit, a cascade collector that
+silently gathered nothing once CSS nesting gave every style rule a `cssRules`
+list, and a `max-width` comparison that measured the border box against a
+content-box limit.
+
+97 tests, 98.6% statements. See [PLAN.md](PLAN.md) for what is next and
+[CHANGELOG.md](CHANGELOG.md) for what changed.
 
 ## Licence
 

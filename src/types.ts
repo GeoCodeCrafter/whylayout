@@ -36,4 +36,11 @@ export interface Fix {
 export interface Report {
   element: Element;
   findings: Finding[];
+  /**
+   * Stylesheets that could not be read, by href. Cross-origin sheets throw on
+   * `.cssRules`, and a cascade answer computed without them can be confidently
+   * wrong - so their presence downgrades every finding to `opaque` rather than
+   * being silently ignored.
+   */
+  opaqueSheets?: string[];
 }

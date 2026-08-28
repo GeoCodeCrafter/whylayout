@@ -40,8 +40,13 @@ function start(host: HTMLElement, root: ShadowRoot): void {
     const target = elementUnder(event, host);
     if (!target) return;
     const rect = target.getBoundingClientRect();
-    box.style.cssText +=
-      `;display:block;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px`;
+    // Assigned property by property: appending to cssText on every pointer move
+    // grows the string without bound until the page crawls.
+    box.style.display = 'block';
+    box.style.top = `${rect.top}px`;
+    box.style.left = `${rect.left}px`;
+    box.style.width = `${rect.width}px`;
+    box.style.height = `${rect.height}px`;
   };
 
   const onClick = (event: MouseEvent): void => {

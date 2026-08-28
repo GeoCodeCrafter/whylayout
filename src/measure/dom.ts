@@ -62,6 +62,10 @@ export class DomMeasurer implements Measurer {
   }
 
   viewportWidth(): number {
-    return document.documentElement.clientWidth;
+    // clientWidth is the right answer because it excludes a classic scrollbar,
+    // but it can come back as 0 before layout has settled or in an embedded
+    // view. innerWidth is the fallback rather than a guess of zero, which would
+    // silently suppress every overflow finding.
+    return document.documentElement.clientWidth || window.innerWidth || 0;
   }
 }

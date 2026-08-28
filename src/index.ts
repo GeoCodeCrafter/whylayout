@@ -1,18 +1,35 @@
+import { brokenFixedPositioning } from './engine/containing.js';
 import { collapsedTopMargin } from './engine/margins.js';
+import { explainProperty, type CascadeSource, type MatchedRule } from './engine/cascade.js';
 import { flexShrinkRefusal } from './engine/flex.js';
 import { horizontalOverflow } from './engine/overflow.js';
+import { ignoredZIndex } from './engine/stacking.js';
+import { widthConstraint } from './engine/sizing.js';
+import { collectMatchedRules } from './measure/cascade-dom.js';
 import { DomMeasurer } from './measure/dom.js';
 import type { Measurer } from './measure/types.js';
 import type { Report } from './types.js';
 
 export type { Report, Finding, Evidence, Fix } from './types.js';
 export type { Measurer, Box } from './measure/types.js';
+export type { MatchedRule, Declaration, CascadeOutcome, CascadeSource } from './engine/cascade.js';
 export { formatReport, formatFinding } from './report/format.js';
 export { DomMeasurer } from './measure/dom.js';
+export { collectMatchedRules, splitSelectorList } from './measure/cascade-dom.js';
+export { resolve, specificity, compareSpecificity, explainProperty } from './engine/cascade.js';
+export { flexShrinkRefusal } from './engine/flex.js';
+export { collapsedTopMargin } from './engine/margins.js';
+export { horizontalOverflow } from './engine/overflow.js';
+export { ignoredZIndex, findStackingContext } from './engine/stacking.js';
+export { brokenFixedPositioning, findTrap } from './engine/containing.js';
+export { widthConstraint, declaredWidth } from './engine/sizing.js';
+export { toggleInspector } from './ui/inspector.js';
 
 export interface ExplainOptions {
   /** Override the source of measurements. Used by the test suite. */
   measurer?: Measurer;
+  /** Override the source of matched CSS rules. Used by the test suite. */
+  cascade?: CascadeSource;
 }
 
 /**
@@ -24,10 +41,50 @@ export interface ExplainOptions {
 export function explain(element: Element, options: ExplainOptions = {}): Report {
   const measurer = options.measurer ?? new DomMeasurer();
 
-  return {
-    element,
-    findings: [...flexShrinkRefusal(element, measurer), ...collapsedTopMargin(element, measurer)],
-  };
+  let rules: MatchedRule[] = [];
+  let opaqueSheets: string[] = [];
+
+  if (options.cascade) {
+    rules = options.cascade(element);
+  } else if (typeof document !== 'undefined') {
+    const collected = collectMatchedRules(element);
+    rules = collected.rules;
+    opaqueSheets = collected.opaqueSheets;
+  }
+
+  const findings = [
+    ...flexShrinkRefusal(element, measurer),
+    ...collapsedTopMargin(element, measurer),
+    ...widthConstraint(element, measurer, rules),
+    ...ignoredZIndex(element, measurer),
+    ...brokenFixedPositioning(element, measurer),
+  ];
+
+  // A stylesheet we could not read may hold the declaration that actually won,
+  // so every finding on this element is downgraded rather than one of them.
+  if (opaqueSheets.length > 0) {
+    for (const finding of findings) finding.confidence = 'opaque';
+  }
+
+  return { element, findings, opaqueSheets };
+}
+
+/**
+ * Which rule won for one property, and what lost. This is the question DevTools
+ * shows the raw material for and never answers.
+ */
+export function explainCascade(
+  element: Element,
+  property: string,
+  options: ExplainOptions = {},
+): Report {
+  const rules = options.cascade
+    ? options.cascade(element)
+    : typeof document !== 'undefined'
+      ? collectMatchedRules(element).rules
+      : [];
+
+  return { element, findings: explainProperty(element, property, rules) };
 }
 
 /**

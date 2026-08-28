@@ -3,15 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>whylayout - three layouts that are lying to you</title>
+    <title>whylayout - seven layouts that are lying to you</title>
     <link rel="stylesheet" href="./broken.css" />
   </head>
   <body>
     <header class="page-header">
-      <h1>Three layouts that are lying to you</h1>
+      <h1>Seven layouts that are lying to you</h1>
       <p>
-        Each section below is broken in a way that looks like a mystery and is not.
-        Press <kbd>I</kbd> or click the button, then click the offending element.
+        Every section below is broken in a way that looks like a mystery and is
+        not. Press <kbd>I</kbd> or click the button, then click the offending
+        element.
       </p>
       <button type="button" id="inspect">Inspect</button>
     </header>
@@ -35,8 +36,8 @@
     <section>
       <h2>2. The gap that is not where you think</h2>
       <p>
-        The panel has no top padding and no top margin, and yet there is 48px of air
-        above it.
+        The panel has no top padding and no top margin, and yet there is 48px of
+        air above it.
       </p>
       <div class="panel">
         <h3 class="panel__title">Panel heading</h3>
@@ -52,6 +53,58 @@
         <div class="tile tile--wide">Not fine</div>
         <div class="tile">Fine</div>
       </div>
+    </section>
+
+    <section>
+      <h2>4. The z-index that does nothing</h2>
+      <p>
+        The badge asks for <code>z-index: 9999</code> and still sits under the
+        ribbon. Raising the number will not help.
+      </p>
+      <div class="stack">
+        <span class="badge">z-index: 9999</span>
+        <span class="ribbon">on top anyway</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. The fixed element that scrolls</h2>
+      <p>
+        The call to action is <code>position: fixed</code>, and it still scrolls
+        away with the page. One property on an ancestor did that.
+      </p>
+      <div class="promo">
+        <div class="cta">position: fixed</div>
+        <p>This wrapper has a transform on it.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>6. The width that was capped</h2>
+      <p>
+        The box asks for <code>width: 480px</code> and renders at 320px. Nothing
+        is overriding the width declaration.
+      </p>
+      <div class="capped">width: 480px</div>
+    </section>
+
+    <section>
+      <h2>7. The width that does nothing at all</h2>
+      <p>
+        This <code>&lt;span&gt;</code> asks for <code>width: 400px</code> and is
+        as wide as its text.
+      </p>
+      <p><span class="inline-width">width: 400px, ignored</span></p>
+    </section>
+
+    <section>
+      <h2>Which rule won?</h2>
+      <p>
+        The heading below is styled by four different rules across two cascade
+        layers, one of them <code>!important</code>. Open the console and run
+        <code>whylayout.explainCascade(document.querySelector('.contested'), 'color')</code>.
+      </p>
+      <h3 class="contested" id="contested">What colour am I, and why?</h3>
     </section>
 
     <script type="module" src="./demo.ts"></script>

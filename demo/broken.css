@@ -1,45 +1,54 @@
-/* Deliberately broken. Each fault is one of the v0.1 findings, and the fix is
-   commented next to it so the demo doubles as documentation. */
+/*
+  Every rule in this file is deliberately wrong in a specific, named way. The
+  demo is the fixture the engines are developed against: if whylayout cannot
+  explain a section here, that engine is not finished.
+*/
+
+@layer base, theme;
 
 :root {
-  color-scheme: light dark;
+  --line: #d5d9e0;
   --ink: #14161a;
-  --paper: #fbfbfd;
-  --line: #d8dbe2;
+  --muted: #6b7280;
 }
 
 body {
   margin: 0;
-  padding: 0 24px 96px;
-  background: var(--paper);
+  padding: 40px 24px 120px;
   color: var(--ink);
+  background: #fbfcfd;
   font: 16px/1.6 system-ui, -apple-system, Segoe UI, sans-serif;
 }
 
-.page-header {
-  max-width: 62ch;
-  padding: 48px 0 24px;
-}
-
-h1 {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  margin: 0 0 0.4em;
-}
-
+.page-header,
 section {
   max-width: 1100px;
-  margin: 0 auto 64px;
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
+  margin: 0 auto 56px;
+}
+
+h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.3em;
+}
+
+section > p {
+  color: var(--muted);
+  max-width: 68ch;
+}
+
+code {
+  font: 13px ui-monospace, Menlo, Consolas, monospace;
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 4px;
 }
 
 button {
   font: inherit;
   padding: 8px 16px;
-  border: 1px solid var(--ink);
-  border-radius: 6px;
-  background: var(--ink);
-  color: var(--paper);
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: white;
   cursor: pointer;
 }
 
@@ -67,40 +76,136 @@ button {
 }
 
 .card__meta {
+  font: 12px ui-monospace, Menlo, Consolas, monospace;
   margin: 0;
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 13px;
 }
 
-/* 2. Nothing separates .panel from its first child, so .panel__title's top
-      margin collapses through and moves the panel. Fix: display: flow-root. */
+/* 2. Nothing separates .panel from its first child, so the child's top margin
+      collapses through and moves the panel. Fix: display: flow-root. */
 .panel {
   background: white;
   border: 1px solid var(--line);
-  border-top-width: 0;
+  border-top: none;
   border-radius: 8px;
-  padding: 0 16px 16px;
 }
 
 .panel__title {
   margin-top: 48px;
+  padding: 0 16px;
 }
 
-/* 3. One tile is wider than the page and drags every ancestor with it.
-      Fix: max-width: 100%, or min-width: 0 since it is a grid item. */
+.panel p {
+  padding: 0 16px 16px;
+  color: var(--muted);
+}
+
+/* 3. One grid item is wider than the grid, which is what makes the page scroll
+      sideways. Its siblings are pushed along but are innocent. */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, auto);
-  gap: 16px;
+  gap: 12px;
 }
 
 .tile {
-  padding: 24px;
   background: white;
   border: 1px solid var(--line);
   border-radius: 8px;
+  padding: 16px;
 }
 
 .tile--wide {
-  width: 1600px;
+  width: 1650px;
+}
+
+/* 4. .badge has z-index: 9999 and it is honoured - but only inside the stacking
+      context .stack created with opacity: 0.99. Fix: remove that opacity. */
+.stack {
+  position: relative;
+  opacity: 0.99;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.badge {
+  position: relative;
+  z-index: 9999;
+  background: #4f9cf9;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.ribbon {
+  position: relative;
+  z-index: 1;
+  margin-left: -40px;
+  background: #14161a;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+/* 5. transform on .promo makes it the containing block for its fixed
+      descendant, so .cta is fixed to .promo and scrolls with it. */
+.promo {
+  transform: translateZ(0);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 90px;
+}
+
+.cta {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  background: #14161a;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+/* 6. max-width always beats width. */
+.capped {
+  width: 480px;
+  max-width: 320px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+/* 7. width does not apply to a non-replaced inline element. */
+.inline-width {
+  display: inline;
+  width: 400px;
+  background: #eef1f5;
+  padding: 2px 6px;
+}
+
+/* 8. Four rules, two layers, one !important. The winner is not the one most
+      people predict: for a normal declaration unlayered beats layered, but the
+      !important declaration in the EARLIER layer beats the !important in the
+      later one. */
+@layer base {
+  .contested {
+    color: rebeccapurple !important;
+  }
+}
+
+@layer theme {
+  h3.contested {
+    color: seagreen !important;
+  }
+}
+
+.contested {
+  color: crimson;
+}
+
+#contested {
+  color: darkorange;
 }

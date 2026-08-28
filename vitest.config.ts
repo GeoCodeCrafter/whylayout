@@ -16,6 +16,7 @@ export default defineConfig({
         // that the mocks were called, so these are covered by the demo fixtures
         // and the e2e suite instead - see PLAN.md v0.2.
         'src/measure/dom.ts',
+        'src/measure/cascade-dom.ts',
         'src/ui/**',
         'src/entries/**',
       ],

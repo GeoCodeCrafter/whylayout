@@ -1,6 +1,6 @@
 {
   "name": "whylayout",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Click an element and get a plain-English explanation of why it looks like that: which rule won, what constrained the size, which margin collapsed, what broke position: fixed.",
   "keywords": [
     "css",
@@ -37,8 +37,14 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
-  "engines": { "node": ">=18.18" },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.18"
+  },
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
@@ -56,5 +62,7 @@
     "vite": "^6.0.0",
     "vitest": "^2.1.8"
   },
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }

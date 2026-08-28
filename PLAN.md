@@ -1,5 +1,11 @@
 # Build plan - whylayout
 
+> **Status: v0.1 shipped.** All eight findings work and are verified against a
+> real browser. What remains is the devtools panel, a grid engine, the docs site,
+> and - most importantly for anyone finding this repo - a GIF at the top of the
+> README.
+
+
 **Pitch:** `witr` for CSS. One narrow question, answered properly, demoed in ten
 seconds.
 
@@ -39,26 +45,26 @@ anyone would install this.
 
 ### v0.1 - the GIF
 
-- [ ] `explain(el)` returning `Finding[]` with `cause`, `evidence`, `fix`
-- [ ] Three engines only: `flex.ts`, `margins.ts`, `overflow.ts` - the three most
-      common real-world confusions
-- [ ] Bookmarklet entry with element picker and a floating panel
-- [ ] A demo page of deliberately broken layouts, one per finding
-- [ ] Record the GIF: click a card, read the sentence, apply the fix
+- [x] `explain(el)` returning `Finding[]` with `cause`, `evidence`, `fix`
+- [x] Eight findings across seven engines - more than the three originally
+      scoped, because the cascade turned out to be the interesting one
+- [x] Bookmarklet entry with element picker and a floating panel
+- [x] A demo page of deliberately broken layouts, one per finding
+- [ ] Record the GIF: click a card, read the sentence, apply the fix  <- next
 
 ### v0.2 - credibility
 
-- [ ] `cascade.ts` - winner and runners-up with specificity and `@layer` support
-- [ ] `sizing.ts` - the full constraint chain
-- [ ] `stacking.ts` and `containing.ts`
-- [ ] Fixture suite: every finding has a page that provokes it and a page that
+- [x] `cascade.ts` - winner and runners-up with specificity and `@layer` support
+- [x] `sizing.ts` - the full constraint chain
+- [x] `stacking.ts` and `containing.ts`
+- [x] Fixture suite: every finding has a page that provokes it and a page that
       must NOT provoke it (false-positive guard)
-- [ ] Coverage thresholds in CI at 85%
+- [x] Coverage thresholds in CI at 85%
 
 ### v0.3 - the install
 
 - [ ] MV3 devtools panel
-- [ ] npm package with `explain()` documented for assertions in tests
+- [x] npm package with `explain()` documented for assertions in tests
 - [ ] `grid.ts`
 - [ ] Docs site: one page per finding, each with a live broken example
 
