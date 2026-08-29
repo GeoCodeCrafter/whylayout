@@ -6,16 +6,14 @@ import { describe } from './flex.js';
 /**
  * "Why is this element this width?" and "why did my width do nothing?"
  *
- * `getComputedStyle().width` reports the *used* width, not what you asked for,
- * which is exactly why the question is hard to answer by reading DevTools: the
- * panel shows you the number you got, not the constraint that produced it.
+ * `getComputedStyle().width` gives you the *used* width, not what you asked for,
+ * which is exactly why this is awkward to answer by eye — the panel shows the
+ * number you got, never the constraint that produced it.
  *
- * Two faults are worth naming, and both are decidable:
- *
- *   1. A `max-width` or `min-width` is the binding constraint, so the declared
- *      width was never going to apply.
- *   2. `width` is inert in this layout mode - on a non-replaced inline element
- *      it does nothing at all, and people spend a while not believing that.
+ * Two faults worth naming, both decidable: a max-width or min-width was the
+ * binding constraint all along, or `width` is inert in this layout mode (on a
+ * non-replaced inline element it does nothing whatsoever, and people take some
+ * convincing).
  */
 
 const TOLERANCE = 0.5;

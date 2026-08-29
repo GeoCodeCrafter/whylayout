@@ -16,21 +16,18 @@ interface Candidate {
 /**
  * "Why does the page scroll sideways?"
  *
- * Every browser tool answers this with a list, and the list is useless: when one
- * element is too wide, all of its ancestors are too wide as well, so the list is
- * mostly the path back to <body>. The answer people want is one element.
+ * Browser tools answer this with a list, and the list is useless — when one box
+ * is too wide every ancestor is too wide too, so mostly you get the path back to
+ * <body>.
  *
- * The subtlety - and this was wrong in the first draft, caught by running it
- * against a real page - is that "furthest past the edge" finds the wrong
- * element. A normal-sized box sitting *after* an oversized sibling is pushed
- * further right than the oversized box itself, so the naive rule names a victim
- * rather than the cause.
+ * The subtlety, which I got wrong first time and only caught on a real page: an
+ * oversized box shoves its later siblings further right than itself, so sorting
+ * by "furthest past the edge" finds a victim rather than the cause. A culprit is
+ * an element that doesn't fit inside its own parent. Deepest one wins, since its
+ * ancestors are only wide on its account.
  *
- * So a culprit is an element that **does not fit inside its own parent**. Among
- * those, the deepest wins, because its ancestors are only wide on its account.
- * When nothing overruns its parent - a whole branch sized wide together - the
- * deepest overflowing element is reported instead, and the finding says which
- * of the two rules produced it.
+ * When nothing overruns its parent — a whole branch sized wide together — it
+ * falls back to the deepest overflowing element and says which rule it used.
  */
 export function horizontalOverflow(root: Element, measurer: Measurer): Finding[] {
   const viewport = measurer.viewportWidth();

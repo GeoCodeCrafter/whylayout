@@ -3,7 +3,7 @@
 [![CI](https://github.com/GeoCodeCrafter/whylayout/actions/workflows/ci.yml/badge.svg)](https://github.com/GeoCodeCrafter/whylayout/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-Click an element. Get a sentence explaining why it looks like that.
+Click an element, find out why it looks like that.
 
 ```
 div.card will not shrink below 426.3px. Flex items start at min-width: auto,
@@ -20,36 +20,43 @@ which refuses to go narrower than their widest unbreakable content.
        break instead.
 ```
 
-That is real output, copied from the demo page, not an illustration.
+That's copied out of the demo page, not mocked up for the README.
 
 ---
 
-## Why this exists
+## Why
 
-DevTools shows you the cascade. It does not tell you the answer.
+DevTools tells you what the values are. It won't tell you why.
 
-The Styles panel is a list of declarations with lines through the losers. Working
-out *why the box ended up that size* is left entirely to you, and it is the
-question every web developer actually has. `min-width: auto` on flex items,
-collapsing margins, a `transform` quietly creating a containing block, the one
-`overflow-x` culprit in a 400-node tree - these are known, enumerable causes with
-known fixes, and nothing in the browser will name them for you.
+The Styles panel gives you a list of declarations with lines through the ones
+that lost, and then you're on your own. Which is fine when the answer is "you
+typoed the class name" and useless when it's `min-width: auto`, or a margin
+collapsing through a parent, or some `transform` three levels up quietly turning
+itself into a containing block.
 
-whylayout names them. It walks the same information DevTools has and turns it
-into a plain-English explanation with the fix attached.
+The thing is, that list of causes is *short*. There are maybe a dozen things that
+regularly make a box the wrong size, they're all in the spec, and they all have a
+known fix. There's no reason you should have to rediscover them by bisecting your
+stylesheet at half four on a Friday.
 
-## Install
+So: click the element, get a sentence.
 
-Nothing to install - drag the bookmarklet to your bar and click any element.
-
-Or load it as a devtools panel:
+## Try it
 
 ```bash
-npm run build
-# Chrome/Edge: load unpacked from dist/extension
+npm install
+npm run demo
 ```
 
-Or call it programmatically, in a test:
+Eight broken sections at <http://localhost:5173>, one per finding. Hit <kbd>I</kbd>
+and click whatever looks wrong.
+
+For real pages, build it and drag `dist/bookmarklet.js` into a bookmark — it's a
+single file with no dependencies, so it works on any site without an extension or
+a permission prompt.
+
+You can also call it from a test, which is the other reason I split the engines
+out from the UI:
 
 ```ts
 import { explain } from 'whylayout';
@@ -58,28 +65,24 @@ const report = explain(document.querySelector('.card')!);
 expect(report.findings.map((f) => f.rule)).not.toContain('flex-min-width-auto');
 ```
 
-## What it explains
+## What it can tell you
 
-| Question | Answer it gives |
+| Question | What you get back |
 | --- | --- |
-| Why is this element this width? | The constraint that bound it - `max-width` capping or `min-width` raising the width you declared |
-| Why did my `width` do nothing? | That it is inert on a non-replaced inline element, or which rule beat it |
+| Why is this element this width? | Whether `max-width` capped it or `min-width` raised it, with both numbers |
+| Why did my `width` do nothing? | That it's inert on a non-replaced inline element, or which rule beat it |
 | Why is there a gap here? | Which margin collapsed through which ancestor, and what would stop it |
-| Why won't this flex item shrink? | `min-width: auto` and the measured unbreakable content setting the floor |
-| Why is my `z-index` ignored? | Whether it is inert on a static element, or trapped in an ancestor's stacking context |
-| Why does the page scroll sideways? | The one element that does not fit its parent, not a list of suspects |
-| Why is this `position: fixed` element not fixed? | The ancestor `transform`/`filter`/`contain` that made it a containing block |
-| Which rule won? | Winner and runners-up with computed specificity, layer, and `!important` |
+| Why won't this flex item shrink? | `min-width: auto`, plus the measured width of the content holding it open |
+| Why is my grid column so wide? | That `1fr` is really `minmax(auto, 1fr)`, and the `auto` is a floor |
+| Why is my `z-index` ignored? | Whether it's inert on a static element, or trapped in an ancestor's stacking context |
+| Why does the page scroll sideways? | The one element that doesn't fit its parent |
+| Why isn't my `position: fixed` fixed? | The ancestor `transform`/`filter`/`contain` that became its containing block |
 
-Every finding carries a `fix` - the declaration to add and where to add it.
+Each finding comes with the declaration to add and where to put it.
 
-All eight work today, and each has a section on the demo page that provokes it.
-Still to come, in [PLAN.md](PLAN.md): the devtools panel, a grid engine, and a
-docs site.
+## The cascade bit
 
-## The cascade, including the part that runs backwards
-
-`explainCascade` resolves one property and shows what lost:
+`explainCascade` resolves a single property and shows its working:
 
 ```js
 whylayout.explainCascade(document.querySelector('.contested'), 'color');
@@ -96,49 +99,80 @@ color on h3#contested.contested is rebeccapurple, from .contested. 3 other decla
   - beaten: color: crimson from .contested - the winner is !important
 ```
 
-That third line is the reason this engine exists rather than a specificity
-calculator. For a normal declaration, unlayered author styles beat layered ones
-and a later `@layer` beats an earlier one. For `!important`, **both of those
-reverse**: layered beats unlayered, and the *earlier* layer wins. It is
-deliberate - it lets a design system publish overridable defaults in a layer and
-still enforce the few rules it must - and it is the single most surprising rule
-in the modern cascade.
+Look at that second line, because it catches people out. Normally an unlayered
+rule beats a layered one, and a later `@layer` beats an earlier one. Add
+`!important` and **both of those flip**: now layered beats unlayered, and the
+*earlier* layer wins.
 
-## The rules that are not negotiable
+It sounds like a bug and it isn't. It's what lets a design system ship defaults
+in a layer that you can freely override, while keeping the handful of rules it
+genuinely needs to enforce. Took me a while to believe it, so the tool spells it
+out rather than just printing a specificity score.
 
-1. **No false explanations.** A finding is emitted only when the engine can point
-   at the CSSOM entry or computed value that proves it. Where it cannot prove a
-   cause it says so instead of guessing.
-2. **Read-only.** The page is never mutated. Diagnosis that changes the patient is
-   not diagnosis. Probes that must mutate run on a cloned subtree and are
-   labelled `speculative`.
-3. **No build step for the user.** The bookmarklet is one self-contained file,
-   works on any site, and needs no extension, no npm, and no permission grant.
-4. **Plain English, jargon second.** "Flex items refuse to shrink below their
-   content" before "`min-width: auto`", never the other way round.
+## Rules I've held myself to
 
-## Running the demo
+**Never guess.** A finding only shows up if the engine can point at the computed
+value or the CSSOM entry that proves it. If it can't prove the cause it says
+nothing, because a confident wrong answer costs you more time than no answer.
 
-```bash
-npm install
-npm run demo
+**Never touch the page.** Everything is read-only. The one measurement that needs
+to change something (min-content width) does it on a detached clone.
+
+**Plain English first.** "Flex items won't shrink below their content" before
+"`min-width: auto`". If you already knew the jargon you wouldn't be asking.
+
+## How it's built
+
+The engines never touch the DOM. They read the page through a `Measurer`
+interface that gets injected, which sounds like architecture astronautics until
+you realise jsdom does no layout at all — `getBoundingClientRect()` returns
+zeroes there. Injecting the measurements is the only way to unit test any of this.
+
+It also forced each engine to declare exactly what it needs to know, which is
+what made the `evidence` field on every finding possible.
+
+```
+src/
+  engine/     one file per finding, pure functions over measurements
+  measure/    the real DOM measurer and the stylesheet walker
+  report/     findings -> English
+  ui/         the picker and panel
 ```
 
-Seven deliberately broken sections, one per finding, at
-<http://localhost:5173>. Press <kbd>I</kbd> and click the offending element.
+## Testing
 
-## Status
+104 unit tests over the engines, and 6 Playwright tests against the demo in a
+real Chromium.
 
-v0.1. All eight findings work and are verified against a real browser, not only
-against unit tests - which mattered, because running it for real is what caught
-the overflow rule naming a victim instead of a culprit, a cascade collector that
-silently gathered nothing once CSS nesting gave every style rule a `cssRules`
-list, and a `max-width` comparison that measured the border box against a
-content-box limit.
+The e2e suite isn't there for completeness. The unit tests feed the engines
+numbers I typed in myself, which catches logic errors and absolutely nothing
+else — it can't tell me whether `getComputedStyle` really reports `auto` for an
+untouched flex item, or whether my stylesheet walker finds any rules at all.
 
-97 tests, 98.6% statements. See [PLAN.md](PLAN.md) for what is next and
-[CHANGELOG.md](CHANGELOG.md) for what changed.
+Both of those were broken at some point while the unit suite sat there green:
+
+- The overflow rule blamed the wrong element. An oversized box shoves its later
+  siblings further right than itself, so "furthest past the edge" finds a victim,
+  not the cause. It's now "the deepest element that doesn't fit its own parent".
+- The cascade walker collected **nothing at all**. Since CSS nesting shipped every
+  `CSSStyleRule` has its own `cssRules` list, so my "is this a grouping rule?"
+  check swallowed every ordinary rule on the way past. No error, no rules, no clue.
+- The `max-width` check compared a border-box measurement against a content-box
+  limit, so any capped element with padding on it looked inexplicable.
+
+All three are pinned by regression tests now. None of them would have been found
+without running the thing for real, which is most of why I bothered wiring up
+Playwright.
+
+## What it can't do yet
+
+- Cross-origin stylesheets can't be read, so anything they affect is flagged
+  `opaque` rather than answered from an incomplete cascade.
+- Shadow DOM and iframes aren't traversed.
+- Percentage and keyword widths aren't resolved. I'd rather say nothing than
+  guess what `50%` came out as.
+- No devtools panel yet — bookmarklet only. See [PLAN.md](PLAN.md).
 
 ## Licence
 
-MIT (c) OpusDevs
+MIT © OpusDevs

@@ -15,12 +15,12 @@ const CONTAINS_MARGINS = new Set([
 ]);
 
 /**
- * "There is a gap above this box and I cannot find where it came from."
+ * "There's a gap above this box and I can't find where it's coming from."
  *
- * The answer is nearly always that the first child's top margin collapsed
- * through the parent and is now pushing the *parent* down. Every condition below
- * is a documented requirement for collapsing, so when all of them hold the cause
- * is established rather than suspected.
+ * Nine times out of ten the first child's top margin has collapsed through the
+ * parent and is now pushing the parent down. Every condition checked below is a
+ * documented requirement for collapsing, so when they all hold the cause is
+ * established rather than suspected.
  */
 export function collapsedTopMargin(element: Element, measurer: Measurer): Finding[] {
   const parent = element.parentElement;

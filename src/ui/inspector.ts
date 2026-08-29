@@ -2,14 +2,11 @@ import { explain, explainOverflow } from '../index.js';
 import { formatReport } from '../report/format.js';
 
 /**
- * The picker and panel.
+ * The picker and the panel.
  *
- * Everything here is presentation, deliberately: no engine logic lives in the
- * UI, so the explanations can be tested without a browser and the bookmarklet
- * stays small enough to paste into a URL bar.
- *
- * The overlay is the one thing whylayout adds to the page, and it removes
- * itself on Escape. It never touches the inspected element.
+ * No engine logic in here at all, which is what keeps the explanations testable
+ * without a browser and the bookmarklet small enough to paste into a bookmark.
+ * The overlay lives in a shadow root and takes itself off the page on Escape.
  */
 
 const HOST_ID = 'whylayout-host';

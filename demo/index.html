@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>whylayout - seven layouts that are lying to you</title>
+    <title>whylayout - eight layouts that are lying to you</title>
     <link rel="stylesheet" href="./broken.css" />
   </head>
   <body>
     <header class="page-header">
-      <h1>Seven layouts that are lying to you</h1>
+      <h1>Eight layouts that are lying to you</h1>
       <p>
         Every section below is broken in a way that looks like a mystery and is
         not. Press <kbd>I</kbd> or click the button, then click the offending
@@ -56,7 +56,20 @@
     </section>
 
     <section>
-      <h2>4. The z-index that does nothing</h2>
+      <h2>4. The grid column that blew out</h2>
+      <p>
+        Three columns of <code>1fr</code>, so they should be equal thirds. The
+        middle one is nearly twice the others and the grid overflows.
+      </p>
+      <div class="cols">
+        <div class="cell">Equal third, allegedly</div>
+        <div class="cell"><code>Supercalifragilisticexpialidocious_and_then_some</code></div>
+        <div class="cell">Equal third, allegedly</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. The z-index that does nothing</h2>
       <p>
         The badge asks for <code>z-index: 9999</code> and still sits under the
         ribbon. Raising the number will not help.
@@ -68,7 +81,7 @@
     </section>
 
     <section>
-      <h2>5. The fixed element that scrolls</h2>
+      <h2>6. The fixed element that scrolls</h2>
       <p>
         The call to action is <code>position: fixed</code>, and it still scrolls
         away with the page. One property on an ancestor did that.
@@ -80,7 +93,7 @@
     </section>
 
     <section>
-      <h2>6. The width that was capped</h2>
+      <h2>7. The width that was capped</h2>
       <p>
         The box asks for <code>width: 480px</code> and renders at 320px. Nothing
         is overriding the width declaration.
@@ -89,7 +102,7 @@
     </section>
 
     <section>
-      <h2>7. The width that does nothing at all</h2>
+      <h2>8. The width that does nothing at all</h2>
       <p>
         This <code>&lt;span&gt;</code> asks for <code>width: 400px</code> and is
         as wide as its text.

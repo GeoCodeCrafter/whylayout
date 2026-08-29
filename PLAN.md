@@ -1,102 +1,56 @@
-# Build plan - whylayout
+# Where this is going
 
-> **Status: v0.1 shipped.** All eight findings work and are verified against a
-> real browser. What remains is the devtools panel, a grid engine, the docs site,
-> and - most importantly for anyone finding this repo - a GIF at the top of the
-> README.
+v0.1 is out. Nine findings, all of them working against a real browser rather
+than just against numbers I typed into a test.
 
+What's left, roughly in the order I care about it.
 
-**Pitch:** `witr` for CSS. One narrow question, answered properly, demoed in ten
-seconds.
+## Next
 
-**Why this one first:** highest star-per-hour of the six. It solves a daily
-humiliation for every working web developer, the demo is a GIF of one click, and
-shipping it proves cascade and layout-algorithm knowledge that most mid-level
-front-end candidates cannot demonstrate.
+- **A GIF at the top of the README.** Genuinely the highest-value thing left.
+  Half the repos I looked at for inspiration won their audience on one image, and
+  right now someone landing here has to clone and run it before they understand
+  what it does.
+- **A devtools panel.** The bookmarklet works everywhere and needs no permission
+  grant, which is why it came first, but a panel is what people expect and it
+  survives a page reload.
 
----
+## After that
 
-## Architecture
+- **A findings catalogue.** One page per finding with a live broken example. Half
+  the value here is educational and the README can't carry that on its own.
+- **Shadow DOM.** Currently not traversed at all. It should at minimum say "this
+  element is inside a shadow root, results may be incomplete" instead of
+  quietly returning less than the whole picture.
+- **More of the sizing chain.** Right now it catches `max-width` capping and
+  `min-width` raising. It doesn't resolve percentages or keywords, and I'm not
+  going to make it guess — but resolving them properly against the containing
+  block is doable and would cover a lot more cases.
+- **`justify-content` and `align-items` doing nothing** because the axis is the
+  one people assume rather than the one it is. Extremely common, decidable.
 
-```
-src/
-  engine/          pure functions: (element, CSSOM snapshot) -> Finding[]
-    cascade.ts       specificity, layers, !important, winner + runners-up
-    sizing.ts        the width/height constraint chain
-    flex.ts          min-width:auto, basis vs width, shrink refusal
-    grid.ts          track sizing, implicit tracks, auto placement
-    margins.ts       collapse detection and the ancestor that would stop it
-    stacking.ts      stacking context ancestry, z-index inertia
-    containing.ts    transform/filter/contain breaking position: fixed
-    overflow.ts      single widest offender causing horizontal scroll
-  report/          Finding -> English, with the fix attached
-  ui/              the inspector overlay (picker, panel, keyboard nav)
-  entries/
-    bookmarklet.ts   single-file IIFE, no deps, self-removing
-    devtools.ts      MV3 panel wrapping the same engine
-    index.ts         npm entry: explain(el) for tests and CI
-```
+## Ideas I'm not sure about
 
-The engine never touches the DOM beyond reading. The UI is a thin shell. That
-split is what makes `explain()` usable inside Vitest, which is the second reason
-anyone would install this.
+- **Firefox port.** Mostly a question of whether anyone asks.
+- **A `--ci` mode** that fails a build when a page grows a horizontal scrollbar.
+  Possibly useful, possibly a solution looking for a problem.
+- **Explaining `position: sticky` not sticking.** The causes are enumerable
+  (`overflow` on an ancestor, no threshold set, parent too short) but proving
+  which one applies is harder than it looks, and a wrong answer here would be
+  worse than none.
 
-## Milestones
+## Notes to self
 
-### v0.1 - the GIF
+**Specificity parsing has limits.** The parser handles `:is()`, `:not()`, `:has()`
+and `:where()`, and counts conservatively for shapes it can't decompose. It is
+not a full CSS grammar and shouldn't pretend to be. If it starts getting selector
+maths wrong, that's the place to look.
 
-- [x] `explain(el)` returning `Finding[]` with `cause`, `evidence`, `fix`
-- [x] Eight findings across seven engines - more than the three originally
-      scoped, because the cascade turned out to be the interesting one
-- [x] Bookmarklet entry with element picker and a floating panel
-- [x] A demo page of deliberately broken layouts, one per finding
-- [ ] Record the GIF: click a card, read the sentence, apply the fix  <- next
+**The demo is the fixture.** Every engine was developed against a section on that
+page. Keep it that way — twice now a fixture failed to provoke a finding and the
+engine turned out to be right, which is only a useful signal if the demo is
+honest about what it's demonstrating.
 
-### v0.2 - credibility
-
-- [x] `cascade.ts` - winner and runners-up with specificity and `@layer` support
-- [x] `sizing.ts` - the full constraint chain
-- [x] `stacking.ts` and `containing.ts`
-- [x] Fixture suite: every finding has a page that provokes it and a page that
-      must NOT provoke it (false-positive guard)
-- [x] Coverage thresholds in CI at 85%
-
-### v0.3 - the install
-
-- [ ] MV3 devtools panel
-- [x] npm package with `explain()` documented for assertions in tests
-- [ ] `grid.ts`
-- [ ] Docs site: one page per finding, each with a live broken example
-
-### v1.0
-
-- [ ] Chrome Web Store listing
-- [ ] Firefox port
-- [ ] Findings catalogue stable and versioned
-
-## Hard problems, decided up front
-
-**Specificity and layers.** `getMatchedCSSRules` is gone. Walk
-`document.styleSheets`, match with `element.matches()`, compute specificity
-locally, respect `@layer` order and `!important`. Cross-origin sheets throw on
-`.cssRules` - catch that, mark the sheet `opaque`, and say so in the report
-rather than silently producing a wrong winner.
-
-**Proving a cause.** Every finding needs evidence a human can check. `flex.ts`
-does not say "min-width: auto" merely because the element is a flex item; it
-measures the widest unbreakable child and reports that measurement as the floor.
-
-**Speculative probes.** Some causes are only provable by changing something and
-re-measuring. Do that on a cloned subtree in an inert container, never on the
-live page, and label the finding `speculative`.
-
-**Shadow DOM and iframes.** Out of scope for v0.1. Detect and say "this element
-is inside a shadow root, results may be incomplete" rather than being quietly
-wrong.
-
-## Launch checklist
-
-- [ ] GIF above the fold in the README, under 3 MB
-- [ ] Live demo page on GitHub Pages with the broken layouts and the bookmarklet
-- [ ] Post to r/webdev, Hacker News (Show HN), Bluesky, Lobsters
-- [ ] Title it as the user's own thought: "Why is this element 340px wide?"
+**Don't let the coverage number drive anything.** The excluded files are excluded
+because mocking a browser would only prove the mocks got called. That's what the
+Playwright suite is for.

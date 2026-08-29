@@ -1,64 +1,64 @@
 # Changelog
 
-All notable changes to this project are documented here.
-
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
-this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
+versioning is [semver](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] - 2026-08-28
 
-First release. Eight findings, all verified against a real browser.
+First release. Nine findings, a bookmarklet, and a demo page that provokes every
+one of them.
 
 ### Added
 
-- **`explain(element)`** - runs every element-scoped engine and returns findings
-  with the evidence that proves each one.
-- **`explainCascade(element, property)`** - resolves one property, naming the
-  winning rule and every runner-up with the reason it lost. Handles specificity,
-  `!important`, inline styles, and `@layer` - including the inversion where
-  `!important` reverses the layer order.
-- **`explainOverflow(root)`** - names the single element responsible for a
-  sideways scroll.
-- **Engines**: flex shrink refusal (`min-width: auto`), margin collapse through a
-  parent, horizontal overflow, cascade resolution, width constraints
-  (`max-width`/`min-width` binding, `width` inert on inline elements), z-index
-  (inert on static, or trapped in an ancestor's stacking context), and
-  `position: fixed` trapped by an ancestor's containing block.
-- **Bookmarklet** - one self-contained file, no install, works on any site.
-- **Demo page** with seven deliberately broken sections, one per finding.
-- **`Measurer` interface** - engines read the page through an injected measurer,
-  so every heuristic is unit testable without a browser.
+- `explain(element)` — runs the element-scoped engines and hands back findings
+  with the evidence behind each one.
+- `explainCascade(element, property)` — resolves one property and shows what
+  lost: specificity, `!important`, inline styles and `@layer`, including the bit
+  where `!important` reverses the layer order.
+- `explainOverflow(root)` — names the single element responsible for a sideways
+  scroll.
+- Engines for: flex items refusing to shrink, `1fr` grid tracks doing the same,
+  margins collapsing through a parent, horizontal overflow, cascade resolution,
+  `max-width`/`min-width` binding a declared width, `width` being inert on inline
+  elements, z-index inert on static elements or trapped in a stacking context,
+  and `position: fixed` caught by an ancestor's containing block.
+- A bookmarklet — one file, no dependencies, works on any site.
+- Demo page with eight deliberately broken sections.
+- Playwright suite running against that page in real Chromium.
 
-### Fixed during development
+### Fixed while building it
 
-These were all found by running the tool against a real page rather than by the
-test suite, and each is now pinned by a regression test.
+All of these were found by running the thing rather than by the unit tests, which
+were green throughout. Each has a regression test now.
 
-- The overflow rule named a **victim rather than a culprit**. An oversized box
-  pushes its later siblings further right than itself, so "furthest past the
-  edge" is the wrong test. A culprit is an element that does not fit inside its
-  own parent; the deepest such element wins.
-- The cascade collector **gathered nothing at all**. Since CSS nesting shipped,
-  every `CSSStyleRule` carries its own `cssRules` list, so testing for that
-  property treated every ordinary rule as a grouping rule and skipped it.
-- The `max-width` check **compared a border-box measurement against a
-  content-box limit**, so a capped element with padding looked unexplainable.
-- `CSSStyleDeclaration`, `CSSRuleList` and `StyleSheetList` are **not reliably
-  iterable** - jsdom implements none of their iterators. All three are now read
-  by index.
-- The inspector overlay **appended to `cssText` on every pointer move**, growing
-  the string without bound until the page crawled.
-- `documentElement.clientWidth` can be `0` before layout settles or in an
-  embedded view, which silently suppressed every overflow finding. It now falls
-  back to `window.innerWidth`.
+- **The overflow rule blamed the wrong element.** An oversized box pushes its
+  later siblings further right than itself, so "furthest past the edge" picks a
+  victim. Now it's "deepest element that doesn't fit its own parent".
+- **The cascade walker collected nothing at all.** Since CSS nesting shipped,
+  every `CSSStyleRule` carries its own `cssRules` list, so my check for grouping
+  rules swallowed every ordinary rule on the way past. Silent — no rules, no
+  error.
+- **`max-width` compared a border-box measurement to a content-box limit**, so a
+  capped element with padding looked inexplicable.
+- **`CSSStyleDeclaration`, `CSSRuleList` and `StyleSheetList` aren't reliably
+  iterable.** jsdom implements none of their iterators. All read by index now.
+- **The inspector appended to `cssText` on every pointer move**, growing the
+  string until the page crawled.
+- **`documentElement.clientWidth` can be 0** before layout settles or in an
+  embedded view, which quietly suppressed every overflow finding. Falls back to
+  `innerWidth`.
 
-### Known limitations
+Two demo fixtures also failed to provoke the flex finding, both times for
+spec-correct reasons — hyphens in the URL made it breakable, then a specified
+width made the automatic minimum size the *smaller* of the specified and content
+suggestions. The engine was right both times.
 
-- Cross-origin stylesheets cannot be read, so any report affected by one is
-  marked `opaque` rather than being quietly computed from an incomplete cascade.
-- Shadow DOM and same-origin iframes are not traversed.
-- Percentage and keyword widths are not resolved, so no width finding is offered
-  for them - guessing what `50%` resolved to would be exactly the confident,
-  wrong answer this tool exists to avoid.
+### Not there yet
+
+- Cross-origin stylesheets can't be read. Anything they touch is flagged
+  `opaque` rather than answered from a partial cascade.
+- No shadow DOM or iframe traversal.
+- Percentage and keyword widths aren't resolved — I'd rather say nothing than
+  guess what `50%` came out as.
 
 [0.1.0]: https://github.com/GeoCodeCrafter/whylayout/releases/tag/v0.1.0

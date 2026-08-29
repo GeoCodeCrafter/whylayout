@@ -5,14 +5,13 @@ import { describe } from './flex.js';
 /**
  * "Why is my position: fixed element scrolling away?"
  *
- * Because `fixed` is fixed to the viewport only until an ancestor becomes its
- * containing block, and several innocuous-looking properties do that. A
- * `transform: translateZ(0)` added for a performance hunch, a `filter` on a
- * wrapper, `will-change`, `contain`, or `backdrop-filter` - any of them and the
- * element is now fixed to that ancestor, which scrolls.
+ * Because `fixed` sticks to the viewport right up until an ancestor becomes its
+ * containing block, and a surprising number of harmless-looking properties do
+ * that: a `translateZ(0)` someone added for a performance hunch, a filter on a
+ * wrapper, `will-change`, `contain`, `backdrop-filter`.
  *
- * This is entirely decidable from computed styles, so the finding is proved
- * rather than suspected: the exact ancestor and the exact property are named.
+ * Entirely decidable from computed styles, so this names the exact ancestor and
+ * the exact property.
  */
 
 /** Properties that make an ancestor the containing block for fixed children. */

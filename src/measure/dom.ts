@@ -3,10 +3,8 @@ import type { Box, Measurer } from './types.js';
 /**
  * The real measurer, backed by a browser that actually does layout.
  *
- * Not unit tested: there is nothing here to test without a layout engine, and a
- * jsdom test of this file would only assert that the mocks were called. It is
- * covered by the demo fixtures instead. Everything with a decision in it lives
- * in the engines, which are tested against a fake measurer.
+ * Not unit tested — there'd be nothing to assert without a layout engine beyond
+ * "the mocks got called". The e2e suite covers it against real Chromium instead.
  */
 export class DomMeasurer implements Measurer {
   readonly #styles = new WeakMap<Element, CSSStyleDeclaration>();

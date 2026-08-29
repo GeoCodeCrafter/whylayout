@@ -9,3 +9,4 @@ blob-report/
 .playwright/
 *.local
 .vite/
+dist-demo/

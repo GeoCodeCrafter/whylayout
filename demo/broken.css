@@ -118,7 +118,29 @@ button {
   width: 1650px;
 }
 
-/* 4. .badge has z-index: 9999 and it is honoured - but only inside the stacking
+/* 4. `1fr` is minmax(auto, 1fr). The auto floor is the min-content width, so the
+      middle column refuses to shrink and the whole grid overruns. Fix on the
+      item: min-width: 0. Fix on the container: minmax(0, 1fr). */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  /* Constrained on purpose. Given a wide container the grid just squeezes the
+     other two tracks and nothing overflows - which is the right outcome, and
+     means there would be nothing here to explain. */
+  width: 420px;
+  max-width: 100%;
+  border: 1px dashed var(--line);
+}
+
+.cell {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* 5. .badge has z-index: 9999 and it is honoured - but only inside the stacking
       context .stack created with opacity: 0.99. Fix: remove that opacity. */
 .stack {
   position: relative;
@@ -147,7 +169,7 @@ button {
   border-radius: 6px;
 }
 
-/* 5. transform on .promo makes it the containing block for its fixed
+/* 6. transform on .promo makes it the containing block for its fixed
       descendant, so .cta is fixed to .promo and scrolls with it. */
 .promo {
   transform: translateZ(0);
@@ -168,7 +190,7 @@ button {
   border-radius: 8px;
 }
 
-/* 6. max-width always beats width. */
+/* 7. max-width always beats width. */
 .capped {
   width: 480px;
   max-width: 320px;
@@ -178,7 +200,7 @@ button {
   padding: 16px;
 }
 
-/* 7. width does not apply to a non-replaced inline element. */
+/* 8. width does not apply to a non-replaced inline element. */
 .inline-width {
   display: inline;
   width: 400px;
@@ -186,7 +208,7 @@ button {
   padding: 2px 6px;
 }
 
-/* 8. Four rules, two layers, one !important. The winner is not the one most
+/* 9. Four rules, two layers, one !important. The winner is not the one most
       people predict: for a normal declaration unlayered beats layered, but the
       !important declaration in the EARLIER layer beats the !important in the
       later one. */

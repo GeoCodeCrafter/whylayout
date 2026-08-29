@@ -1,15 +1,11 @@
 /**
- * The engines never touch the DOM directly. Every fact about the page arrives
- * through this interface.
+ * Engines never touch the DOM. Every fact about the page comes through here.
  *
- * Two reasons, both load-bearing:
- *
- * 1. jsdom has no layout engine, so `getBoundingClientRect` returns zeroes
- *    there. Injecting the measurer is the only way the engines can be unit
- *    tested at all, and untested layout heuristics are exactly the kind that
- *    quietly lie to people.
- * 2. It forces every engine to declare what it needs to know, which is what
- *    makes a finding's `evidence` writable in the first place.
+ * Two reasons. First, jsdom does no layout — `getBoundingClientRect` returns
+ * zeroes — so injecting the measurements is the only way to unit test any of
+ * this, and untested layout heuristics are precisely the kind that lie to
+ * people. Second, it forces each engine to declare what it needs to know, which
+ * is what makes the `evidence` on a finding writable at all.
  */
 
 export interface Box {

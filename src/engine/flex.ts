@@ -7,19 +7,15 @@ const FLEX_CONTAINERS = new Set(['flex', 'inline-flex']);
 const TOLERANCE = 0.5;
 
 /**
- * The single most common flexbox confusion: an item that will not shrink,
- * because flex items default to `min-width: auto` and that keyword refuses to go
- * below the widest unbreakable thing inside.
+ * The classic flexbox gotcha: an item that won't shrink because flex items get
+ * `min-width: auto`, and that keyword won't go below the widest unbreakable
+ * thing inside.
  *
- * This is only emitted when all three facts hold, each of them measured:
- *
- *   1. the element is a shrinkable item of a flex container;
- *   2. its min-width resolves to `auto`;
- *   3. its width is sitting exactly on its min-content width while the line
- *      overflows - i.e. the content floor is what is binding, not a stylesheet.
- *
- * Without (3) the element merely *could* be stuck. Reporting that would be a
- * guess, and a guess that a developer acts on is worse than saying nothing.
+ * Only fires when all three are measured to be true: it's a shrinkable flex
+ * item, min-width resolves to auto, and its width is sitting exactly on its
+ * min-content width while the line overflows. Without that last check the
+ * element merely *might* be stuck, and a guess someone acts on is worse than
+ * saying nothing.
  */
 export function flexShrinkRefusal(element: Element, measurer: Measurer): Finding[] {
   const parent = element.parentElement;

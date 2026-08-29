@@ -1,9 +1,10 @@
 import type { Finding, Report } from '../types.js';
 
 /**
- * Findings as plain text - the form used by the bookmarklet panel, the console
- * output, and the README. Deliberately not HTML: if the explanation does not
- * read well as a paragraph, it is not a good explanation yet.
+ * Findings as plain text — used by the panel, the console and the README.
+ *
+ * Not HTML, on purpose: if an explanation doesn't read well as a paragraph it
+ * isn't a good explanation yet.
  */
 export function formatReport(report: Report): string {
   if (report.findings.length === 0) {

@@ -5,17 +5,17 @@ import { describe } from './flex.js';
 /**
  * "Why is my z-index being ignored?"
  *
- * Two different answers, and telling them apart is the whole value:
+ * Two completely different answers, and telling them apart is the useful part:
  *
- *   1. `z-index` does nothing at all on a statically positioned, non-flex,
- *      non-grid item. The declaration is inert. People raise the number.
- *   2. The z-index works perfectly, but it is only compared against siblings
- *      inside the nearest ancestor that created a stacking context. If that
- *      ancestor sits below the thing you are trying to cover, no number will
- *      help - 9999 loses to an ancestor's 1.
+ *   1. z-index does nothing at all on a statically positioned element that isn't
+ *      a flex or grid item. The declaration is inert. People respond by raising
+ *      the number.
+ *   2. It works fine, but it's only compared against siblings inside the nearest
+ *      ancestor that made a stacking context. If that ancestor sits below the
+ *      thing you're trying to cover, no number helps — 9999 loses to someone
+ *      else's 1.
  *
- * The second is the one that wastes afternoons, and it is the one nothing in
- * the browser will point at for you.
+ * The second one is the afternoon-waster.
  */
 
 const NONE = new Set(['none', 'normal', 'auto', '']);

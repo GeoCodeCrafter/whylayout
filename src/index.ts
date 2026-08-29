@@ -2,6 +2,7 @@ import { brokenFixedPositioning } from './engine/containing.js';
 import { collapsedTopMargin } from './engine/margins.js';
 import { explainProperty, type CascadeSource, type MatchedRule } from './engine/cascade.js';
 import { flexShrinkRefusal } from './engine/flex.js';
+import { gridTrackRefusal } from './engine/grid.js';
 import { horizontalOverflow } from './engine/overflow.js';
 import { ignoredZIndex } from './engine/stacking.js';
 import { widthConstraint } from './engine/sizing.js';
@@ -18,6 +19,7 @@ export { DomMeasurer } from './measure/dom.js';
 export { collectMatchedRules, splitSelectorList } from './measure/cascade-dom.js';
 export { resolve, specificity, compareSpecificity, explainProperty } from './engine/cascade.js';
 export { flexShrinkRefusal } from './engine/flex.js';
+export { gridTrackRefusal } from './engine/grid.js';
 export { collapsedTopMargin } from './engine/margins.js';
 export { horizontalOverflow } from './engine/overflow.js';
 export { ignoredZIndex, findStackingContext } from './engine/stacking.js';
@@ -54,6 +56,7 @@ export function explain(element: Element, options: ExplainOptions = {}): Report 
 
   const findings = [
     ...flexShrinkRefusal(element, measurer),
+    ...gridTrackRefusal(element, measurer),
     ...collapsedTopMargin(element, measurer),
     ...widthConstraint(element, measurer, rules),
     ...ignoredZIndex(element, measurer),
