@@ -11,5 +11,10 @@ export default defineConfig({
     outDir: '../dist-demo',
     emptyOutDir: true,
     target: 'es2022',
+    // Leave the CSS alone. The minifier rewrites `rebeccapurple` to
+    // `rgb(102, 51, 153)`, and since the whole point of the cascade section is
+    // reading your own declarations back, the deployed demo should show what
+    // was actually written.
+    cssMinify: false,
   },
 });

@@ -5,6 +5,9 @@
 
 Click an element, find out why it looks like that.
 
+**[Try it →](https://geocodecrafter.github.io/whylayout/)** — eight deliberately
+broken layouts, hit <kbd>I</kbd> and click whatever looks wrong.
+
 ```
 div.card will not shrink below 426.3px. Flex items start at min-width: auto,
 which refuses to go narrower than their widest unbreakable content.
@@ -43,13 +46,15 @@ So: click the element, get a sentence.
 
 ## Try it
 
+There's a [hosted demo](https://geocodecrafter.github.io/whylayout/), or run it
+yourself:
+
 ```bash
 npm install
 npm run demo
 ```
 
-Eight broken sections at <http://localhost:5173>, one per finding. Hit <kbd>I</kbd>
-and click whatever looks wrong.
+Eight broken sections at <http://localhost:5173>, one per finding.
 
 For real pages, build it and drag `dist/bookmarklet.js` into a bookmark — it's a
 single file with no dependencies, so it works on any site without an extension or
