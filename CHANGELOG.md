@@ -1,5 +1,8 @@
 # Changelog
 
+Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
+versioning is [semver](https://semver.org/spec/v2.0.0.html).
+
 ## Unreleased
 
 ### Added
@@ -19,8 +22,6 @@
   Same mistake the `max-width` check made earlier — content box versus border box
   is evidently a trap in this codebase.
 
-Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
-versioning is [semver](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] - 2026-08-28
 
