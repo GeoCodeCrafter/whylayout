@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>whylayout - eight layouts that are lying to you</title>
+    <title>whylayout - nine layouts that are lying to you</title>
     <link rel="stylesheet" href="./broken.css" />
   </head>
   <body>
     <header class="page-header">
-      <h1>Eight layouts that are lying to you</h1>
+      <h1>Nine layouts that are lying to you</h1>
       <p>
         Every section below is broken in a way that looks like a mystery and is
         not. Press <kbd>I</kbd> or click the button, then click the offending
@@ -108,6 +108,19 @@
         as wide as its text.
       </p>
       <p><span class="inline-width">width: 400px, ignored</span></p>
+    </section>
+
+    <section>
+      <h2>9. The centring that does nothing</h2>
+      <p>
+        This bar is <code>display: flex</code> with <code>align-items: center</code>
+        on it. The icon still sits at the top and nothing you do to
+        <code>align-items</code> changes that.
+      </p>
+      <div class="bar">
+        <div class="bar__icon">tall</div>
+        <div class="bar__label">align-items: center, allegedly</div>
+      </div>
     </section>
 
     <section>

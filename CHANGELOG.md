@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **`align-items` / `justify-content` with no free space.** The declaration is
+  fine and does nothing, because the container is already exactly its content's
+  size on that axis. Reported as "nothing to do here yet" rather than as a
+  mistake, since it starts working the moment the container gets a height.
+- Shadow roots are now detected. Findings inside one are downgraded to `opaque`,
+  because the component's stylesheet isn't in `document.styleSheets` and any
+  cascade answer would be built from a fraction of the rules.
+
+### Fixed
+
+- The new alignment engine measured free space against the border box, so a 1px
+  border read as 2px of spare room and the finding never fired on a real page.
+  Same mistake the `max-width` check made earlier — content box versus border box
+  is evidently a trap in this codebase.
+
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning is [semver](https://semver.org/spec/v2.0.0.html).
 

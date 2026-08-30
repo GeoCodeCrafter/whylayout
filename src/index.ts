@@ -1,3 +1,4 @@
+import { alignmentWithNoFreeSpace } from './engine/alignment.js';
 import { brokenFixedPositioning } from './engine/containing.js';
 import { collapsedTopMargin } from './engine/margins.js';
 import { explainProperty, type CascadeSource, type MatchedRule } from './engine/cascade.js';
@@ -24,6 +25,7 @@ export { collapsedTopMargin } from './engine/margins.js';
 export { horizontalOverflow } from './engine/overflow.js';
 export { ignoredZIndex, findStackingContext } from './engine/stacking.js';
 export { brokenFixedPositioning, findTrap } from './engine/containing.js';
+export { alignmentWithNoFreeSpace } from './engine/alignment.js';
 export { widthConstraint, declaredWidth } from './engine/sizing.js';
 export { toggleInspector } from './ui/inspector.js';
 
@@ -61,6 +63,7 @@ export function explain(element: Element, options: ExplainOptions = {}): Report 
     ...widthConstraint(element, measurer, rules),
     ...ignoredZIndex(element, measurer),
     ...brokenFixedPositioning(element, measurer),
+    ...alignmentWithNoFreeSpace(element, measurer),
   ];
 
   // A stylesheet we could not read may hold the declaration that actually won,
@@ -69,7 +72,15 @@ export function explain(element: Element, options: ExplainOptions = {}): Report 
     for (const finding of findings) finding.confidence = 'opaque';
   }
 
-  return { element, findings, opaqueSheets };
+  // Styles inside a shadow root come from the component's own stylesheet, which
+  // is not in document.styleSheets. Rather than answer from a cascade that is
+  // missing most of the rules, say so.
+  const inShadow = isInShadowRoot(element);
+  if (inShadow) {
+    for (const finding of findings) finding.confidence = 'opaque';
+  }
+
+  return { element, findings, opaqueSheets, inShadowRoot: inShadow };
 }
 
 /**
@@ -100,4 +111,10 @@ export function explainOverflow(
 ): Report {
   const measurer = options.measurer ?? new DomMeasurer();
   return { element: root, findings: horizontalOverflow(root, measurer) };
+}
+
+/** True when the element lives inside a shadow root rather than the document. */
+function isInShadowRoot(element: Element): boolean {
+  const root = element.getRootNode?.();
+  return typeof ShadowRoot !== 'undefined' && root instanceof ShadowRoot;
 }

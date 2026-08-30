@@ -5,7 +5,7 @@
 
 Click an element, find out why it looks like that.
 
-**[Try it →](https://geocodecrafter.github.io/whylayout/)** — eight deliberately
+**[Try it →](https://geocodecrafter.github.io/whylayout/)** — nine deliberately
 broken layouts, hit <kbd>I</kbd> and click whatever looks wrong.
 
 ```
@@ -54,7 +54,7 @@ npm install
 npm run demo
 ```
 
-Eight broken sections at <http://localhost:5173>, one per finding.
+Nine broken sections at <http://localhost:5173>, one per finding.
 
 For real pages, build it and drag `dist/bookmarklet.js` into a bookmark — it's a
 single file with no dependencies, so it works on any site without an extension or
@@ -82,6 +82,7 @@ expect(report.findings.map((f) => f.rule)).not.toContain('flex-min-width-auto');
 | Why is my `z-index` ignored? | Whether it's inert on a static element, or trapped in an ancestor's stacking context |
 | Why does the page scroll sideways? | The one element that doesn't fit its parent |
 | Why isn't my `position: fixed` fixed? | The ancestor `transform`/`filter`/`contain` that became its containing block |
+| Why did `align-items: center` do nothing? | That there's no free space on that axis for it to move anything through |
 
 Each finding comes with the declaration to add and where to put it.
 
@@ -146,7 +147,7 @@ src/
 
 ## Testing
 
-104 unit tests over the engines, and 6 Playwright tests against the demo in a
+114 unit tests over the engines, and 6 Playwright tests against the demo in a
 real Chromium.
 
 The e2e suite isn't there for completeness. The unit tests feed the engines
@@ -163,7 +164,10 @@ Both of those were broken at some point while the unit suite sat there green:
   `CSSStyleRule` has its own `cssRules` list, so my "is this a grouping rule?"
   check swallowed every ordinary rule on the way past. No error, no rules, no clue.
 - The `max-width` check compared a border-box measurement against a content-box
-  limit, so any capped element with padding on it looked inexplicable.
+  limit, so any capped element with padding on it looked inexplicable. The
+  alignment engine then made the same mistake independently a week later — a 1px
+  border reading as 2px of spare room — which suggests it's a trap worth watching
+  for rather than a one-off.
 
 All three are pinned by regression tests now. None of them would have been found
 without running the thing for real, which is most of why I bothered wiring up
@@ -173,7 +177,8 @@ Playwright.
 
 - Cross-origin stylesheets can't be read, so anything they affect is flagged
   `opaque` rather than answered from an incomplete cascade.
-- Shadow DOM and iframes aren't traversed.
+- Iframes aren't traversed. Shadow roots are detected and flagged rather than
+  answered from a cascade that's missing the component's own stylesheet.
 - Percentage and keyword widths aren't resolved. I'd rather say nothing than
   guess what `50%` came out as.
 - No devtools panel yet — bookmarklet only. See [PLAN.md](PLAN.md).

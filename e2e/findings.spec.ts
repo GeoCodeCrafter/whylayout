@@ -30,6 +30,7 @@ test('every section on the demo page produces the finding it was built for', asy
       fixed: first('.cta'),
       maxWidth: first('.capped'),
       inlineWidth: first('.inline-width'),
+      alignment: first('.bar'),
     };
   });
 
@@ -40,6 +41,7 @@ test('every section on the demo page produces the finding it was built for', asy
   expect(findings.fixed).toContain('fixed to div.promo');
   expect(findings.maxWidth).toContain('max-width: 320px capped it');
   expect(findings.inlineWidth).toContain('does not apply to non-replaced inline');
+  expect(findings.alignment).toContain('has nothing to move');
 });
 
 test('the sideways scroll is blamed on the one element that caused it', async ({ page }) => {

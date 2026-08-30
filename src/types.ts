@@ -43,4 +43,10 @@ export interface Report {
    * being silently ignored.
    */
   opaqueSheets?: string[];
+  /**
+   * True when the element sits inside a shadow root. Its component stylesheet is
+   * not in `document.styleSheets`, so any cascade answer would be built from a
+   * fraction of the rules. Findings are downgraded to `opaque` when this is set.
+   */
+  inShadowRoot?: boolean;
 }

@@ -208,7 +208,30 @@ button {
   padding: 2px 6px;
 }
 
-/* 9. Four rules, two layers, one !important. The winner is not the one most
+/* 9. align-items: center needs spare room on the cross axis to move anything
+      through, and the bar is exactly as tall as its tallest child. The
+      declaration is fine; there is simply nothing for it to do until the bar
+      has a height. */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0;
+}
+
+.bar__icon {
+  background: #eef1f5;
+  padding: 24px 12px;
+}
+
+.bar__label {
+  padding: 0 8px;
+}
+
+/* 10. Four rules, two layers, one !important. The winner is not the one most
       people predict: for a normal declaration unlayered beats layered, but the
       !important declaration in the EARLIER layer beats the !important in the
       later one. */
