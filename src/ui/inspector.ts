@@ -54,10 +54,22 @@ function start(host: HTMLElement, root: ShadowRoot): void {
 
     const element = explain(target);
     const overflow = explainOverflow();
-    const findings = [...element.findings, ...overflow.findings];
 
     title.textContent = selectorFor(target);
-    output.textContent = formatReport({ element: target, findings });
+
+    // The overflow finding is about the page, not the element you clicked, so it
+    // gets its own heading. Merged into the same list it just reads as a second
+    // explanation of the thing under the cursor, which it isn't.
+    let text = formatReport({ element: target, findings: element.findings });
+    if (overflow.findings.length > 0) {
+      text += `
+
+--- elsewhere on this page ---
+
+${formatReport(overflow)}`;
+    }
+
+    output.textContent = text;
   };
 
   const onKey = (event: KeyboardEvent): void => {

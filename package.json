@@ -53,13 +53,16 @@
     "test:coverage": "vitest run --coverage",
     "demo": "vite serve demo",
     "test:e2e": "playwright test",
-    "demo:build": "vite build"
+    "demo:build": "vite build",
+    "demo:gif": "node scripts/record-gif.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
     "@types/node": "^22.10.2",
     "@vitest/coverage-v8": "^2.1.8",
+    "gifenc": "^1.0.3",
     "jsdom": "^25.0.1",
+    "pngjs": "^7.0.0",
     "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "vite": "^6.0.0",

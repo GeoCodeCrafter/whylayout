@@ -8,6 +8,8 @@ Click an element, find out why it looks like that.
 **[Try it →](https://geocodecrafter.github.io/whylayout/)** — nine deliberately
 broken layouts, hit <kbd>I</kbd> and click whatever looks wrong.
 
+![Clicking a flex item, a grid cell and a collapsed margin, and getting an explanation of each](docs/demo.gif)
+
 ```
 div.card will not shrink below 426.3px. Flex items start at min-width: auto,
 which refuses to go narrower than their widest unbreakable content.
@@ -172,6 +174,25 @@ Both of those were broken at some point while the unit suite sat there green:
 All three are pinned by regression tests now. None of them would have been found
 without running the thing for real, which is most of why I bothered wiring up
 Playwright.
+
+## The GIF above
+
+It's generated, not screen-recorded:
+
+```bash
+npm run demo &
+npm run demo:gif
+```
+
+Playwright drives the demo, screenshots each frame, and `gifenc` encodes them.
+Playwright does bundle an ffmpeg, but it's a stripped build with no GIF muxer and
+no palette filters, so it only does webm — hence encoding in Node instead. One
+palette is shared across every frame; quantising them separately makes the
+colours crawl and it looks like compression damage.
+
+Screenshots don't capture the mouse pointer, which makes a click-driven demo
+impossible to follow, so the script draws a cursor into the page and moves it in
+step with the real one.
 
 ## What it can't do yet
 
