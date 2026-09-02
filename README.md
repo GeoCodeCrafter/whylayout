@@ -204,6 +204,18 @@ step with the real one.
   guess what `50%` came out as.
 - No devtools panel yet — bookmarklet only. See [PLAN.md](PLAN.md).
 
+
+## The rest of the family
+
+Same idea, different question. Each one answers narrowly and refuses to guess.
+
+| | Question | |
+| --- | --- | --- |
+| [whylayout](https://github.com/GeoCodeCrafter/whylayout) | Why does this element look like that? | ✅ |
+| [whyfocus](https://github.com/GeoCodeCrafter/whyfocus) | Why can't I tab to this? | ✅ |
+| `whyslow` | Why did that interaction take 300ms? | planned |
+| `whybundle` | Why is this 400 kB in my bundle? | planned |
+
 ## Licence
 
 MIT © OpusDevs
